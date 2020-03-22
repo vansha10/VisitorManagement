@@ -4,4 +4,5 @@
     <string name="submit">Submit</string>
     <string name="attach_your_picture">Attach your picture:</string>
     <string name="phoneNumberErrorMessage">Please enter a valid phone number</string>
+    <string name="picture_error">Please attach a picture</string>
 </resources>

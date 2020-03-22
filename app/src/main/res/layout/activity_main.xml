@@ -67,7 +67,7 @@
                 <ImageView
                     android:id="@+id/photo_imageview"
                     android:layout_width="128dp"
-                    android:layout_height="128dp"
+                    android:layout_height="170dp"
                     android:visibility="gone" />
             </LinearLayout>
 
