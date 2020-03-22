@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "339128595213",
+    "firebase_url": "https://visitormanagement-va2020.firebaseio.com",
+    "project_id": "visitormanagement-va2020",
+    "storage_bucket": "visitormanagement-va2020.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:339128595213:android:58997610a891353fe0b644",
+        "android_client_info": {
+          "package_name": "com.o.visitormanagement"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "339128595213-fv65vl56fkic6kbcnkja96cgavgeipha.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBb8AIQ53mSz3BeAkF7DchFywwS7SzD0x0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "339128595213-fv65vl56fkic6kbcnkja96cgavgeipha.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
