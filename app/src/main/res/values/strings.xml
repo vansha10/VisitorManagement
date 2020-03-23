@@ -6,10 +6,12 @@
     <string name="phoneNumberErrorMessage">Please enter a valid phone number</string>
     <string name="picture_error">Please attach a picture</string>
     <string name="verification_failed">Verification Failed</string>
-    <string name="invalid_code_msg">The code you entered was invalid!</string>
-    <string name="success_msg">Success! Uploading Data</string>
+    <string name="invalid_code_msg">Invalid OTP! Suspicious User Reported</string>
+    <string name="success_msg">OTP Verified!</string>
     <string name="sending_otp">Sending OTP</string>
     <string name="uploading_image">Uploading Image</string>
     <string name="almost_there">Almost there!</string>
     <string name="uploading_user_data">Uploading User Data</string>
+    <string name="visitor_saved">New Visitor Saved!</string>
+    <string name="validating_otp">Validating OTP</string>
 </resources>

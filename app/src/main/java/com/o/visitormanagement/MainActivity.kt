@@ -108,6 +108,7 @@ class MainActivity : AppCompatActivity() {
 
                 binding.phoneLayout.visibility = View.GONE
                 binding.codeLayout.visibility = View.VISIBLE
+                binding.progressLayout.visibility = View.GONE
 
                 verificationActive = true
 
@@ -117,6 +118,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
+        binding.progressLayout.visibility = View.VISIBLE
+        binding.status.text = getString(R.string.validating_otp)
+        binding.submitButton.visibility = View.GONE
+        binding.codeLayout.visibility = View.GONE
+
         val auth : FirebaseAuth = FirebaseAuth.getInstance()
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
@@ -126,13 +132,7 @@ class MainActivity : AppCompatActivity() {
 
                     val user = task.result?.user
 
-                    //TODO : upload data
-
-                    binding.codeLayout.visibility = View.GONE
-
                     verificationActive = false
-
-                    binding.submitButton.visibility = View.GONE
 
                     Snackbar.make(
                         binding.mainLayout,
@@ -148,16 +148,7 @@ class MainActivity : AppCompatActivity() {
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
                         // The verification code entered was invalid
 
-
-                        //TODO : upload suspicous data
-
-                        binding.progressLayout.visibility = View.INVISIBLE
-
-                        Snackbar.make(
-                            binding.mainLayout,
-                            getString(R.string.invalid_code_msg),
-                            Snackbar.LENGTH_SHORT
-                        ).show()
+                        uploadSuspiciousUserImage(phoneNumber)
                     }
                 }
             }
@@ -191,7 +182,7 @@ class MainActivity : AppCompatActivity() {
             phoneNumber = "+91$phoneNumber"
             PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 phoneNumber, // Phone number to verify
-                120, // Timeout duration
+                30, // Timeout duration
                 TimeUnit.SECONDS, // Unit of timeout
                 this, // Activity (for callback binding)
                 callbacks) // OnVerificationStateChangedCallbacks
@@ -225,13 +216,7 @@ class MainActivity : AppCompatActivity() {
         viewmodel.uploadImageFromFile(imageFile)
         var downloadUrl : String
         val imageDownloadUrlObserver = Observer<Uri> { uri ->
-            // Update the UI, in this case, a TextView.
             downloadUrl = uri.toString()
-            Snackbar.make(
-                binding.mainLayout,
-                downloadUrl,
-                Snackbar.LENGTH_SHORT
-            ).show()
             val user = User(phoneNumber, downloadUrl, 1)
             uploadUserData(uid, user)
 
@@ -243,5 +228,38 @@ class MainActivity : AppCompatActivity() {
         binding.status.text = getString(R.string.almost_there)
         viewmodel.uploadUserData(uid, user)
         binding.progressLayout.visibility = View.GONE
+        Snackbar.make(
+            binding.mainLayout,
+            getString(R.string.visitor_saved),
+            Snackbar.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun uploadSuspiciousUserImage(uid : String) {
+        viewmodel.uploadImageFromFile(imageFile)
+        var downloadUrl : String
+        val imageDownloadUrlObserver = Observer<Uri> { uri ->
+            downloadUrl = uri.toString()
+            val user = User(phoneNumber, downloadUrl, 0)
+            uploadSuspiciousUserData(uid, user)
+
+        }
+        viewmodel.downloadUrl.observe(this, imageDownloadUrlObserver)
+    }
+
+    private fun uploadSuspiciousUserData(uid: String, user: User) {
+        binding.status.text = getString(R.string.almost_there)
+        viewmodel.uploadSuspiciousUserData(uid, user)
+        binding.progressLayout.visibility = View.GONE
+        Snackbar.make(
+            binding.mainLayout,
+            getString(R.string.invalid_code_msg),
+            Snackbar.LENGTH_SHORT
+        ).show()
+
+        binding.codeLayout.visibility = View.GONE
+        binding.phoneLayout.visibility = View.VISIBLE
+        binding.submitButton.visibility = View.VISIBLE
+        verificationActive = false
     }
 }

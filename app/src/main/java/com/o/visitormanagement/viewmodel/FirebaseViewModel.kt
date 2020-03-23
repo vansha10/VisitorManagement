@@ -30,4 +30,8 @@ class FirebaseViewModel : ViewModel() {
         firebaseRepository!!.uploadUserData(uid, user)
     }
 
+    fun uploadSuspiciousUserData(uid: String, user: User) {
+        firebaseRepository!!.uploadSuspiciousUserData(uid, user)
+    }
+
 }

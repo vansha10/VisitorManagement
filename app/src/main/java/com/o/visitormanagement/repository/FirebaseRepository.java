@@ -26,6 +26,7 @@ public class FirebaseRepository {
     private MutableLiveData<Uri> imageDownloadUrl = new MutableLiveData<>();
     private StorageReference imagesRef;
     private DatabaseReference visitorRef;
+    private DatabaseReference suspiciousRef;
 
     public static FirebaseRepository getInstance() {
         if (instance == null) {
@@ -41,6 +42,7 @@ public class FirebaseRepository {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         visitorRef = database.getReference("visitors");
+        suspiciousRef = database.getReference("suspicious_users");
     }
 
     public void uploadImageFromFIle(File file) {
@@ -63,7 +65,7 @@ public class FirebaseRepository {
             public void onComplete(@NonNull Task<Uri> task) {
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
-                    imageDownloadUrl.setValue(uri);
+                    imageDownloadUrl.setValue(downloadUri);
                 } else {
                     // Handle failures
                     // ...
@@ -74,6 +76,10 @@ public class FirebaseRepository {
 
     public void uploadUserData(String uid, User user) {
         visitorRef.child(uid).setValue(user);
+    }
+
+    public void uploadSuspiciousUserData(String uid, User user) {
+        suspiciousRef.child(uid).setValue(user);
     }
 
     public LiveData<Uri> getDownloadUri() {
