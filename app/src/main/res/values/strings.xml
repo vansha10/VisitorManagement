@@ -5,4 +5,7 @@
     <string name="attach_your_picture">Attach your picture:</string>
     <string name="phoneNumberErrorMessage">Please enter a valid phone number</string>
     <string name="picture_error">Please attach a picture</string>
+    <string name="verification_failed">Verification Failed</string>
+    <string name="invalid_code_msg">The code you entered was invalid!</string>
+    <string name="success_msg">Success! Uploading Data</string>
 </resources>
