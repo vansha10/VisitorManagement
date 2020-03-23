@@ -12,8 +12,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -23,7 +27,10 @@ import java.io.File;
 
 public class FirebaseRepository {
     public static FirebaseRepository instance;
+
     private MutableLiveData<Uri> imageDownloadUrl = new MutableLiveData<>();
+    private MutableLiveData<Boolean> userExists = new MutableLiveData<>();
+
     private StorageReference imagesRef;
     private DatabaseReference visitorRef;
     private DatabaseReference suspiciousRef;
@@ -43,6 +50,8 @@ public class FirebaseRepository {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         visitorRef = database.getReference("visitors");
         suspiciousRef = database.getReference("suspicious_users");
+
+        userExists.setValue(null);
     }
 
     public void uploadImageFromFIle(File file) {
@@ -80,6 +89,28 @@ public class FirebaseRepository {
 
     public void uploadSuspiciousUserData(String uid, User user) {
         suspiciousRef.child(uid).setValue(user);
+    }
+
+    public void checkIfUserExists(String phoneNumber) {
+        Query queries = visitorRef.orderByChild("phoneNumber").equalTo(phoneNumber);
+        ValueEventListener eventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()) {
+                    userExists.setValue(false);
+                } else {
+                    userExists.setValue(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+        queries.addListenerForSingleValueEvent(eventListener);
+    }
+
+    public LiveData<Boolean> getUserExists() {
+        return userExists;
     }
 
     public LiveData<Uri> getDownloadUri() {

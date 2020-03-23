@@ -24,6 +24,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.o.visitormanagement.model.User
 import com.o.visitormanagement.viewmodel.FirebaseViewModel
 import java.util.concurrent.TimeUnit
@@ -178,18 +182,40 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
         if (valid) {
-
             phoneNumber = "+91$phoneNumber"
-            PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                phoneNumber, // Phone number to verify
-                30, // Timeout duration
-                TimeUnit.SECONDS, // Unit of timeout
-                this, // Activity (for callback binding)
-                callbacks) // OnVerificationStateChangedCallbacks
-            binding.progressLayout.visibility = View.VISIBLE
-            binding.status.text = getString(R.string.sending_otp)
-            binding.phoneLayout.visibility = View.GONE
+            checkIfUserExists(phoneNumber)
         }
+    }
+
+    private fun checkIfUserExists(phoneNumber: String) {
+        viewmodel.checkUserExists(phoneNumber)
+        val userExistsObserver = Observer<Boolean> { exists ->
+            if (exists != null) {
+                if (!exists) {
+                    sendOTP()
+                } else {
+                    Snackbar.make(
+                        binding.mainLayout,
+                        "User exists",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+        viewmodel.userExists.observe(this, userExistsObserver)
+
+    }
+
+    private fun sendOTP() {
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+            phoneNumber, // Phone number to verify
+            30, // Timeout duration
+            TimeUnit.SECONDS, // Unit of timeout
+            this, // Activity (for callback binding)
+            callbacks) // OnVerificationStateChangedCallbacks
+        binding.progressLayout.visibility = View.VISIBLE
+        binding.status.text = getString(R.string.sending_otp)
+        binding.phoneLayout.visibility = View.GONE
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

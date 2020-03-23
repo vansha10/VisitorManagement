@@ -18,6 +18,9 @@ class FirebaseViewModel : ViewModel() {
     val downloadUrl: LiveData<Uri>
         get() = firebaseRepository!!.downloadUri
 
+    val userExists : LiveData<Boolean>
+        get() = firebaseRepository!!.userExists
+
     fun init() {
         firebaseRepository = FirebaseRepository.getInstance()
     }
@@ -33,5 +36,10 @@ class FirebaseViewModel : ViewModel() {
     fun uploadSuspiciousUserData(uid: String, user: User) {
         firebaseRepository!!.uploadSuspiciousUserData(uid, user)
     }
+
+    fun checkUserExists(phoneNumber : String) {
+        firebaseRepository!!.checkIfUserExists(phoneNumber)
+    }
+
 
 }
