@@ -1,11 +1,10 @@
-package com.o.visitormanagement
+package com.o.visitormanagement.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Matrix
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,12 +12,12 @@ import android.util.Size
 import android.view.Surface
 import android.view.TextureView
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.o.visitormanagement.R
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -40,7 +39,9 @@ class CameraActivity : AppCompatActivity() {
             viewFinder.post { setupCamera() }
         } else {
             ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+                this,
+                REQUIRED_PERMISSIONS,
+                REQUEST_CODE_PERMISSIONS
             )
         }
 

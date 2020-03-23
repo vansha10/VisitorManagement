@@ -1,4 +1,4 @@
-package com.o.visitormanagement
+package com.o.visitormanagement.activity
 
 import android.app.Activity
 import android.content.Intent
@@ -9,25 +9,18 @@ import com.o.visitormanagement.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.net.Uri
 import android.util.Log
 import android.view.View
 import java.io.File
-import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.FirebaseException
-import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
+import com.o.visitormanagement.R
 import com.o.visitormanagement.model.User
 import com.o.visitormanagement.viewmodel.FirebaseViewModel
 import java.util.concurrent.TimeUnit
@@ -51,7 +44,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this,
+            R.layout.activity_main
+        )
 
         binding.getPhotoButton.setOnClickListener { getPhoto() }
         binding.submitButton.setOnClickListener {
@@ -65,6 +60,30 @@ class MainActivity : AppCompatActivity() {
         viewmodel.init()
 
         initializeCallbacks()
+    }
+
+    private fun checkDetails() {
+        var valid = true
+        phoneNumber = binding.phoneEditText.text.toString()
+        if (phoneNumber.length != 10) {
+            valid = false
+            Snackbar.make(
+                binding.mainLayout,
+                R.string.phoneNumberErrorMessage,
+                Snackbar.LENGTH_SHORT
+            ).show()
+        } else if (imageFile == null) {
+            valid = false
+            Snackbar.make(
+                binding.mainLayout,
+                getString(R.string.picture_error),
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }
+        if (valid) {
+            phoneNumber = "+91$phoneNumber"
+            checkIfUserExists(phoneNumber)
+        }
     }
 
     private fun checkCode() {
@@ -159,33 +178,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getPhoto() {
-        val intent : Intent = Intent(this, CameraActivity::class.java)
+        val intent = Intent(this, CameraActivity::class.java)
         startActivityForResult(intent, CAMERA_REQUEST)
     }
 
-    private fun checkDetails() {
-        var valid = true
-        phoneNumber = binding.phoneEditText.text.toString()
-        if (phoneNumber.length != 10) {
-            valid = false
-            Snackbar.make(
-                binding.mainLayout,
-                R.string.phoneNumberErrorMessage,
-                Snackbar.LENGTH_SHORT
-            ).show()
-        } else if (imageFile == null) {
-            valid = false
-            Snackbar.make(
-                binding.mainLayout,
-                getString(R.string.picture_error),
-                Snackbar.LENGTH_SHORT
-            ).show()
-        }
-        if (valid) {
-            phoneNumber = "+91$phoneNumber"
-            checkIfUserExists(phoneNumber)
-        }
-    }
 
     private fun checkIfUserExists(phoneNumber: String) {
         viewmodel.checkUserExists(phoneNumber)
@@ -194,11 +190,9 @@ class MainActivity : AppCompatActivity() {
                 if (!exists) {
                     sendOTP()
                 } else {
-                    Snackbar.make(
-                        binding.mainLayout,
-                        "User exists",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    val intent = Intent(this, UserActivity::class.java)
+                    intent.putExtra("phoneNumber", phoneNumber)
+                    startActivity(intent)
                 }
             }
         }
@@ -243,22 +237,23 @@ class MainActivity : AppCompatActivity() {
         var downloadUrl : String
         val imageDownloadUrlObserver = Observer<Uri> { uri ->
             downloadUrl = uri.toString()
-            val user = User(phoneNumber, downloadUrl, 1)
-            uploadUserData(uid, user)
+            val user = User(uid, phoneNumber, downloadUrl, 1)
+            uploadUserData(user)
 
         }
         viewmodel.downloadUrl.observe(this, imageDownloadUrlObserver)
     }
 
-    private fun uploadUserData(uid: String, user: User) {
+    private fun uploadUserData(user: User) {
         binding.status.text = getString(R.string.almost_there)
-        viewmodel.uploadUserData(uid, user)
+        viewmodel.uploadUserData(user)
         binding.progressLayout.visibility = View.GONE
         Snackbar.make(
             binding.mainLayout,
             getString(R.string.visitor_saved),
             Snackbar.LENGTH_SHORT
         ).show()
+        //TODO: new activity
     }
 
     private fun uploadSuspiciousUserImage(uid : String) {
@@ -266,16 +261,16 @@ class MainActivity : AppCompatActivity() {
         var downloadUrl : String
         val imageDownloadUrlObserver = Observer<Uri> { uri ->
             downloadUrl = uri.toString()
-            val user = User(phoneNumber, downloadUrl, 0)
-            uploadSuspiciousUserData(uid, user)
+            val user = User(uid, phoneNumber, downloadUrl, 0)
+            uploadSuspiciousUserData(user)
 
         }
         viewmodel.downloadUrl.observe(this, imageDownloadUrlObserver)
     }
 
-    private fun uploadSuspiciousUserData(uid: String, user: User) {
+    private fun uploadSuspiciousUserData(user: User) {
         binding.status.text = getString(R.string.almost_there)
-        viewmodel.uploadSuspiciousUserData(uid, user)
+        viewmodel.uploadSuspiciousUserData(user)
         binding.progressLayout.visibility = View.GONE
         Snackbar.make(
             binding.mainLayout,

@@ -29,17 +29,23 @@ class FirebaseViewModel : ViewModel() {
         firebaseRepository!!.uploadImageFromFIle(file)
     }
 
-    fun uploadUserData(uid : String, user : User) {
-        firebaseRepository!!.uploadUserData(uid, user)
+    fun uploadUserData(user : User) {
+        firebaseRepository!!.uploadUserData(user)
     }
 
-    fun uploadSuspiciousUserData(uid: String, user: User) {
-        firebaseRepository!!.uploadSuspiciousUserData(uid, user)
+    fun uploadSuspiciousUserData(user: User) {
+        firebaseRepository!!.uploadSuspiciousUserData(user)
     }
 
     fun checkUserExists(phoneNumber : String) {
         firebaseRepository!!.checkIfUserExists(phoneNumber)
     }
 
+    fun getUserData(phoneNumber: String?) : LiveData<User>{
+        return firebaseRepository!!.getUserData(phoneNumber)
+    }
 
+    fun incrementVisitCount(uid : String, count : Int) {
+        firebaseRepository!!.incrementVisitCount(uid, count)
+    }
 }

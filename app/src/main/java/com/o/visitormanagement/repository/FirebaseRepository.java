@@ -2,6 +2,7 @@ package com.o.visitormanagement.repository;
 
 
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -30,10 +31,12 @@ public class FirebaseRepository {
 
     private MutableLiveData<Uri> imageDownloadUrl = new MutableLiveData<>();
     private MutableLiveData<Boolean> userExists = new MutableLiveData<>();
+    private MutableLiveData<User> userData = new MutableLiveData<>();
 
     private StorageReference imagesRef;
     private DatabaseReference visitorRef;
     private DatabaseReference suspiciousRef;
+    private String TAG = "Firebase";
 
     public static FirebaseRepository getInstance() {
         if (instance == null) {
@@ -52,6 +55,7 @@ public class FirebaseRepository {
         suspiciousRef = database.getReference("suspicious_users");
 
         userExists.setValue(null);
+        userData.setValue(null);
     }
 
     public void uploadImageFromFIle(File file) {
@@ -83,12 +87,14 @@ public class FirebaseRepository {
         });
     }
 
-    public void uploadUserData(String uid, User user) {
-        visitorRef.child(uid).setValue(user);
+    public void uploadUserData(User user) {
+        visitorRef.child(user.getUid()).child("phoneNumber").setValue(user.getPhoneNumber());
+        visitorRef.child(user.getUid()).child("photoDownloadUrl").setValue(user.getPhotoDownloadUrl());
+        visitorRef.child(user.getUid()).child("visitCount").setValue(user.getVistCount());
     }
 
-    public void uploadSuspiciousUserData(String uid, User user) {
-        suspiciousRef.child(uid).setValue(user);
+    public void uploadSuspiciousUserData(User user) {
+        suspiciousRef.child(user.getUid()).setValue(user);
     }
 
     public void checkIfUserExists(String phoneNumber) {
@@ -111,6 +117,33 @@ public class FirebaseRepository {
 
     public LiveData<Boolean> getUserExists() {
         return userExists;
+    }
+
+    public LiveData<User> getUserData(String phoneNumber) {
+        Query queries = visitorRef.orderByChild("phoneNumber").equalTo(phoneNumber);
+        ValueEventListener eventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot: dataSnapshot.getChildren()) {
+                        String uid = userSnapshot.getKey();
+                        String url = userSnapshot.child("photoDownloadUrl").getValue(String.class);
+                        Integer count = userSnapshot.child("visitCount").getValue(Integer.class);
+                        User user = new User(uid, phoneNumber, url, count);
+                        userData.setValue(user);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+        queries.addListenerForSingleValueEvent(eventListener);
+        return userData;
+    }
+
+    public void incrementVisitCount(String uid, int count) {
+        visitorRef.child(uid).child("visitCount").setValue(count);
     }
 
     public LiveData<Uri> getDownloadUri() {
