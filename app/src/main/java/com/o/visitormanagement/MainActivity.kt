@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
 
                 verificationActive = false
 
-                binding.progressbar.visibility = View.INVISIBLE
+                binding.progressLayout.visibility = View.INVISIBLE
 
                 Snackbar.make(
                     binding.mainLayout,
@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity() {
 
                         //TODO : upload suspicous data
 
-                        binding.progressbar.visibility = View.INVISIBLE
+                        binding.progressLayout.visibility = View.INVISIBLE
 
                         Snackbar.make(
                             binding.mainLayout,
@@ -195,7 +195,8 @@ class MainActivity : AppCompatActivity() {
                 TimeUnit.SECONDS, // Unit of timeout
                 this, // Activity (for callback binding)
                 callbacks) // OnVerificationStateChangedCallbacks
-            binding.progressbar.visibility = View.VISIBLE
+            binding.progressLayout.visibility = View.VISIBLE
+            binding.status.text = getString(R.string.sending_otp)
             binding.phoneLayout.visibility = View.GONE
         }
     }
@@ -220,6 +221,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun uploadImage(uid : String) {
+        binding.status.text = getString(R.string.uploading_user_data)
         viewmodel.uploadImageFromFile(imageFile)
         var downloadUrl : String
         val imageDownloadUrlObserver = Observer<Uri> { uri ->
@@ -230,14 +232,16 @@ class MainActivity : AppCompatActivity() {
                 downloadUrl,
                 Snackbar.LENGTH_SHORT
             ).show()
-            val user = User(uid, phoneNumber, downloadUrl, 1)
-            uploadUserData(user)
+            val user = User(phoneNumber, downloadUrl, 1)
+            uploadUserData(uid, user)
 
         }
         viewmodel.downloadUrl.observe(this, imageDownloadUrlObserver)
     }
 
-    private fun uploadUserData(user: User) {
-
+    private fun uploadUserData(uid: String, user: User) {
+        binding.status.text = getString(R.string.almost_there)
+        viewmodel.uploadUserData(uid, user)
+        binding.progressLayout.visibility = View.GONE
     }
 }

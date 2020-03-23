@@ -12,6 +12,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -23,6 +25,7 @@ public class FirebaseRepository {
     public static FirebaseRepository instance;
     private MutableLiveData<Uri> imageDownloadUrl = new MutableLiveData<>();
     private StorageReference imagesRef;
+    private DatabaseReference visitorRef;
 
     public static FirebaseRepository getInstance() {
         if (instance == null) {
@@ -35,6 +38,9 @@ public class FirebaseRepository {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
         imagesRef = storageRef.child("user_images");
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        visitorRef = database.getReference("visitors");
     }
 
     public void uploadImageFromFIle(File file) {
@@ -66,8 +72,8 @@ public class FirebaseRepository {
         });
     }
 
-    public void uploadUserData(User user) {
-
+    public void uploadUserData(String uid, User user) {
+        visitorRef.child(uid).setValue(user);
     }
 
     public LiveData<Uri> getDownloadUri() {

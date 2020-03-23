@@ -5,6 +5,7 @@ import android.net.Uri
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.o.visitormanagement.model.User
 
 import com.o.visitormanagement.repository.FirebaseRepository
 
@@ -23,6 +24,10 @@ class FirebaseViewModel : ViewModel() {
 
     fun uploadImageFromFile(file: File?) {
         firebaseRepository!!.uploadImageFromFIle(file)
+    }
+
+    fun uploadUserData(uid : String, user : User) {
+        firebaseRepository!!.uploadUserData(uid, user)
     }
 
 }
