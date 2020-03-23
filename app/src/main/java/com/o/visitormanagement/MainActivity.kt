@@ -10,10 +10,12 @@ import com.google.android.material.snackbar.Snackbar
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.net.Uri
 import android.util.Log
 import android.view.View
 import java.io.File
 import androidx.exifinterface.media.ExifInterface
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.FirebaseException
@@ -130,8 +132,6 @@ class MainActivity : AppCompatActivity() {
 
                     verificationActive = false
 
-                    binding.progressbar.visibility = View.INVISIBLE
-
                     binding.submitButton.visibility = View.GONE
 
                     Snackbar.make(
@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
                         Snackbar.LENGTH_SHORT
                     ).show()
 
-                    uploadImage()
+                    uploadImage(user!!.uid)
                     // ...
                 } else {
                     // Sign in failed, display a message and update the UI
@@ -219,8 +219,25 @@ class MainActivity : AppCompatActivity() {
         imageFile = pictureFile
     }
 
-    private fun uploadImage() {
+    private fun uploadImage(uid : String) {
         viewmodel.uploadImageFromFile(imageFile)
+        var downloadUrl : String
+        val imageDownloadUrlObserver = Observer<Uri> { uri ->
+            // Update the UI, in this case, a TextView.
+            downloadUrl = uri.toString()
+            Snackbar.make(
+                binding.mainLayout,
+                downloadUrl,
+                Snackbar.LENGTH_SHORT
+            ).show()
+            val user = User(uid, phoneNumber, downloadUrl, 1)
+            uploadUserData(user)
+
+        }
+        viewmodel.downloadUrl.observe(this, imageDownloadUrlObserver)
+    }
+
+    private fun uploadUserData(user: User) {
 
     }
 }
