@@ -97,7 +97,7 @@ public class FirebaseRepository {
         suspiciousRef.child(user.getUid()).setValue(user);
     }
 
-    public void checkIfUserExists(String phoneNumber) {
+    public LiveData<Boolean> getUserExists(String phoneNumber) {
         Query queries = visitorRef.orderByChild("phoneNumber").equalTo(phoneNumber);
         ValueEventListener eventListener = new ValueEventListener() {
             @Override
@@ -113,9 +113,6 @@ public class FirebaseRepository {
             public void onCancelled(DatabaseError databaseError) {}
         };
         queries.addListenerForSingleValueEvent(eventListener);
-    }
-
-    public LiveData<Boolean> getUserExists() {
         return userExists;
     }
 
@@ -148,6 +145,14 @@ public class FirebaseRepository {
 
     public LiveData<Uri> getDownloadUri() {
         return imageDownloadUrl;
+    }
+
+    public void setExistsToNull() {
+        userExists.setValue(null);
+    }
+
+    public void setUserDataToNull() {
+        userData.setValue(null);
     }
 
 }

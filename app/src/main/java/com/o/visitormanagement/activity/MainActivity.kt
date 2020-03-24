@@ -58,8 +58,13 @@ class MainActivity : AppCompatActivity() {
 
         viewmodel = ViewModelProviders.of(this).get(FirebaseViewModel::class.java)
         viewmodel.init()
+        viewmodel.setExistsToNull()
 
         initializeCallbacks()
+
+        if (intent.getBooleanExtra("EXIT", false)) {
+            finish()
+        }
     }
 
     private fun checkDetails() {
@@ -184,7 +189,6 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun checkIfUserExists(phoneNumber: String) {
-        viewmodel.checkUserExists(phoneNumber)
         val userExistsObserver = Observer<Boolean> { exists ->
             if (exists != null) {
                 if (!exists) {
@@ -196,7 +200,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        viewmodel.userExists.observe(this, userExistsObserver)
+        viewmodel.checkUserExists(phoneNumber).observe(this, userExistsObserver)
 
     }
 
@@ -253,7 +257,10 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.visitor_saved),
             Snackbar.LENGTH_SHORT
         ).show()
-        //TODO: new activity
+
+        val intent = Intent(this, UserActivity::class.java)
+        intent.putExtra("user", user)
+        startActivity(intent)
     }
 
     private fun uploadSuspiciousUserImage(uid : String) {
@@ -282,5 +289,20 @@ class MainActivity : AppCompatActivity() {
         binding.phoneLayout.visibility = View.VISIBLE
         binding.submitButton.visibility = View.VISIBLE
         verificationActive = false
+    }
+
+    override fun onStart() {
+        viewmodel.setExistsToNull()
+        super.onStart()
+    }
+
+    override fun onResume() {
+        viewmodel.setExistsToNull()
+        super.onResume()
+    }
+
+    override fun onRestart() {
+        viewmodel.setExistsToNull()
+        super.onRestart()
     }
 }
