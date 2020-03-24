@@ -14,4 +14,6 @@
     <string name="uploading_user_data">Uploading User Data</string>
     <string name="visitor_saved">New Visitor Saved!</string>
     <string name="validating_otp">Validating OTP</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="verification_code">Verification Code</string>
 </resources>

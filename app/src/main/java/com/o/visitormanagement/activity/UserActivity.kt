@@ -17,7 +17,8 @@ import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.R
-
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 
 
 class UserActivity : AppCompatActivity() {
@@ -48,14 +49,23 @@ class UserActivity : AppCompatActivity() {
                 if (user != null) {
                     binding.welcome.text = "Welcome Back!\nVisit Count = ${++user.vistCount}"
                     viewmodel.incrementVisitCount(user.uid, user.vistCount)
+                    updateUI(user.phoneNumber, user.photoDownloadUrl)
                 }
             }
             viewmodel.getUserData(phoneNumber).observe(this, userUrlObserver)
         } else {
             if (userData != null) {
                 binding.welcome.text = "Welcome Back!\nVisit Count = ${userData!!.vistCount}"
+                updateUI(userData!!.phoneNumber, userData!!.photoDownloadUrl)
             }
         }
+    }
+
+    private fun updateUI(phoneNumber : String, url : String) {
+        binding.userPhone.text = phoneNumber
+
+        Glide.with(this).load(url).placeholder(
+            getDrawable(com.o.visitormanagement.R.drawable.ic_person_black_160dp)).into(binding.userPhoto)
     }
 
     override fun onBackPressed() {
