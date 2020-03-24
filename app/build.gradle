@@ -6,7 +6,23 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'com.google.gms.google-services'
 
+
 android {
+    signingConfigs {
+        release {
+            storeFile file("release.keystore")
+            storePassword 'mykeypassword'
+            keyAlias 'mykey'
+            keyPassword 'kmykeypassword'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
@@ -16,12 +32,6 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
